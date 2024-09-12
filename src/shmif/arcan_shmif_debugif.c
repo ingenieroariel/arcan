@@ -1417,8 +1417,8 @@ static void set_process_window(struct debug_ctx* dctx)
 /* build a process description string that we periodically update */
 	char* buf = NULL;
 	size_t buf_sz = 0;
-	FILE* outf = open_memstream(&buf, &buf_sz);
-	if (!outf)
+	//FILE* outf = open_memstream(&buf, &buf_sz);
+	//if (!outf)
 		return;
 
 /* some options, like nice-level etc. should perhaps also be exposed
