@@ -1419,26 +1419,26 @@ static void set_process_window(struct debug_ctx* dctx)
 	size_t buf_sz = 0;
 	//FILE* outf = open_memstream(&buf, &buf_sz);
 	//if (!outf)
-		return;
+	//	return;
 
 /* some options, like nice-level etc. should perhaps also be exposed
  * here in an editable way */
 
-	build_process_str(outf);
-	fflush(outf);
-	struct tui_bufferwnd_opts opts = {
-		.read_only = true,
-		.view_mode = BUFFERWND_VIEW_ASCII,
-		.wrap_mode = BUFFERWND_WRAP_ACCEPT_LF,
-		.allow_exit = true
-	};
+	//build_process_str(outf);
+	//fflush(outf);
+	//struct tui_bufferwnd_opts opts = {
+	//	.read_only = true,
+	//	.view_mode = BUFFERWND_VIEW_ASCII,
+	//	.wrap_mode = BUFFERWND_WRAP_ACCEPT_LF,
+	//	.allow_exit = true
+	//};
 
-	run_buffer(dctx->tui, (uint8_t*) buf, buf_sz, opts, "process");
+	//run_buffer(dctx->tui, (uint8_t*) buf, buf_sz, opts, "process");
 /* check return code and update if commit */
 
-	if (outf)
-		fclose(outf);
-	free(buf);
+	//if (outf)
+	//	fclose(outf);
+	//free(buf);
 }
 
 static void root_menu(struct debug_ctx* dctx)
