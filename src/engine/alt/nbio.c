@@ -33,6 +33,17 @@
 #include "nbio.h"
 #include "nbio_local.h"
 
+#include <stddef.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+/* Create a named pipe (FIFO) named PATH with protections MODE.  */
+int
+mkfifo (const char *path, mode_t mode)
+{
+  return __mknod (path, mode | S_IFIFO, 0);
+}
+
+
 #if LUA_VERSION_NUM == 501
 	#define lua_rawlen(x, y) lua_objlen(x, y)
 #endif
@@ -1005,7 +1016,7 @@ static struct pathfd build_fifo_ipc(char* path, bool userns, bool expect_write)
 	struct stat fi;
 	if (-1 == stat(path, &fi)){
 		if (expect_write){
-			if (-1 ==sys_mkfifo(workpath, S_IRWXU)){
+			if (-1 ==mkfifo(workpath, S_IRWXU)){
 				arcan_mem_free(workpath);
 				res.err = "Couldn't build FIFO";
 				return res;
