@@ -1,4 +1,5 @@
- * License: 3-Clause BSD, see COPYING file in arcan source repository.
+/* 
+* License: 3-Clause BSD, see COPYING file in arcan source repository.
  * Reference: http://arcan-fe.com
  */
 
