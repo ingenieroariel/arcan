@@ -1,4 +1,3 @@
-H
 # and install targets, but also for some external projects that need to
 # do an in-source build of shmif- and its platform (automated build/
 # test systems etc) without a full installation.
