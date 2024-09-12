@@ -154,7 +154,6 @@ set_property(SOURCE ${ASD}/shmif/tui/raster/raster.c
 
 set(TARGET_LIST
 	arcan_shmif
-	arcan_shmif_int
 	arcan_shmif_ext
 	arcan_shmif_intext
 	arcan_tui
