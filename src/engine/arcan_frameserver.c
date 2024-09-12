@@ -871,7 +871,7 @@ enum arcan_ffunc_rv arcan_frameserver_vdirect FFUNC_HEAD
  * find the related vstore and if not, the default */
 		struct agp_vstore* dst_store = vobj->frameset ?
 			vobj->frameset->frames[vobj->frameset->index].frame : vobj->vstore;
-		struct arcan_shmif_region dirty = atomic_load(&shmpage->dirty);
+		//struct arcan_shmif_region dirty = atomic_load(&shmpage->dirty);
 
 /* while we're here, check if audio should be processed as well */
 		do_aud = (atomic_load(&tgt->shm.ptr->aready) > 0 &&
@@ -1109,7 +1109,7 @@ enum arcan_ffunc_rv arcan_frameserver_avfeedframe FFUNC_HEAD
 				};
 
 			atomic_store(&src->shm.ptr->vpts, arcan_timemillis());
-			atomic_store(&src->shm.ptr->dirty, reg);
+			//atomic_store(&src->shm.ptr->dirty, reg);
 
 	/* only mark vready if we go the manual buffer route, otherwise the device
 	 * events act as clock */
