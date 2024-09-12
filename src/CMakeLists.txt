@@ -229,9 +229,7 @@ else()
 endif()
 
 if (BUILD_PRESET STREQUAL "everything" AND NOT (CLIENT_LIBRARY_BUILD OR BUILD_PRESET STREQUAL "client" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	set(VIDEO_PLATFORM "egl-dri")
 	set(HYBRID_SDL ON)
-	set(HYBRID_HEADLESS ON)
 endif()
 
 add_compile_options(-Wall)
