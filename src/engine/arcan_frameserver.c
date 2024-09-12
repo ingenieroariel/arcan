@@ -1100,12 +1100,12 @@ enum arcan_ffunc_rv arcan_frameserver_avfeedframe FFUNC_HEAD
  * when to drop and when to double frames
  */
 			//struct arcan_shmif_region reg;
-			if (src->desc.region_valid)
-				reg = src->desc.region;
-			else
-				reg = (struct arcan_shmif_region){
-					.x2 = src->desc.width, .y2 = src->desc.height
-				};
+			//if (src->desc.region_valid)
+			//	reg = src->desc.region;
+			//else
+			//	reg = (struct arcan_shmif_region){
+			//		.x2 = src->desc.width, .y2 = src->desc.height
+			//	};
 
 			atomic_store(&src->shm.ptr->vpts, arcan_timemillis());
 			//atomic_store(&src->shm.ptr->dirty, reg);
