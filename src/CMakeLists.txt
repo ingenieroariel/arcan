@@ -589,7 +589,6 @@ endif()
 
 set(SHMIF_TUI true)
 add_subdirectory(shmif)
-add_subdirectory(a12)
 if (NOT (CLIENT_LIBRARY_BUILD OR BUILD_PRESET STREQUAL "client"))
 	add_subdirectory(wayland)
 endif()
