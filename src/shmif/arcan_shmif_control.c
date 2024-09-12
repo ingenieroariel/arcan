@@ -1773,7 +1773,7 @@ static bool step_v(struct arcan_shmif_cont* ctx, int sigv)
 			);
 		}
 
-		atomic_store(&ctx->addr->dirty, ctx->dirty);
+		//atomic_store(&ctx->addr->dirty, ctx->dirty);
 
 /* set an invalid dirty region so any subsequent signals would be ignored until
  * they are updated (i.e. something has changed) */
