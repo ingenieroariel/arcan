@@ -165,7 +165,6 @@ if (NOT SHMIF_DISABLE_DEBUGIF)
 	list(APPEND SHMIF_SOURCES ${ASD}/shmif/arcan_shmif_debugif.c)
 endif()
 
-add_library(arcan_shmif_int STATIC ${SHMIF_SOURCES} ${SHMIF_PLATFORM})
 add_library(arcan_shmif_server_int STATIC ${SHMIF_SERVER_SOURCES})
 add_library(arcan_shmif STATIC ${SHMIF_SOURCES} ${SHMIF_PLATFORM})
 add_library(arcan_shmif_ext STATIC ${SHMIF_EXT_SOURCES})
