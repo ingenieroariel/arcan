@@ -698,12 +698,6 @@ void a12helper_a12cl_shmifsrv(struct a12_state* S,
 
 /* Socket in/out liveness, buffer flush / dispatch */
 	size_t n_fd = 2;
-	static const short errmask = POLLERR | POLLNVAL | POLLHUP;
-	struct pollfd fds[3] = {
-		{	.fd = fd_in, .events = POLLIN | errmask},
-		{ .fd = pipe_pair[0], .events = POLLIN | errmask},
-		{ .fd = fd_out, .events = POLLOUT | errmask}
-	};
 
 /* flush authentication leftovers */
 	a12_unpack(S, NULL, 0, arg, on_srv_event);
