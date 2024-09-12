@@ -1005,7 +1005,7 @@ static struct pathfd build_fifo_ipc(char* path, bool userns, bool expect_write)
 	struct stat fi;
 	if (-1 == stat(path, &fi)){
 		if (expect_write){
-			if (-1 == mkfifo(workpath, S_IRWXU)){
+			if (-1 ==sys_mkfifo(workpath, S_IRWXU)){
 				arcan_mem_free(workpath);
 				res.err = "Couldn't build FIFO";
 				return res;
