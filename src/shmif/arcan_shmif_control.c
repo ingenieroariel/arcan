@@ -40,9 +40,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#ifdef __LINUX
-#include <sys/syscalls.h>
-#endif
 
 #ifndef COUNT_OF
 #define COUNT_OF(x) \
@@ -539,49 +536,6 @@ static bool pause_evh(struct arcan_shmif_cont* c,
 	return rv;
 }
 
-#ifdef __LINUX
-static bool notify_wait(const char* cpoint)
-{
-/* if we get here we really shouldnt be at the stage of a broken connpath,
- * and if we are the connect loop won't do much of anything */
-	char buf[256];
-	int len = arcan_shmif_resolve_connpath(cpoint, buf, 256);
-	if (len <= 0)
-		return false;
-
-/* path in abstract namespace or non-absolute */
-	if (buf[0] != '/')
-		return false;
-
-/* strip down to the path itself */
-	size_t pos = strlen(buf);
-	while(pos > 0 && buf[pos] != '/')
-		pos--;
-
-	if (!pos)
-		return false;
-
-	buf[pos] = '\0';
-
-	int notify = sys_inotify_init1(IN_CLOEXEC);
-	if (-1 == notify)
-		return false;
-
-/* watch the path for changes */
-	if (-1 == sys_inotify_add_watch(notify, buf, IN_CREATE)){
-		close(notify);
-		return false;
-	}
-
-/* just wait for something, the path shouldn't be particularly active */
-	struct sys_inotify_event ev;
-	read(notify, &ev, sizeof(ev));
-
-	close(notify);
-	return true;
-}
-#endif
-
 static enum shmif_migrate_status fallback_migrate(
 	struct arcan_shmif_cont* c, const char* cpoint, bool force)
 {
@@ -609,14 +563,6 @@ static enum shmif_migrate_status fallback_migrate(
 		else
 			current = cpoint;
 
-/* if there is a poll mechanism to use, go for it, otherwise fallback to a
- * timesleep - special cases include a12://, non-linux, ... */
-#ifdef __LINUX
-		if (!(strlen(cpoint) > 6 &&
-			strncmp(cpoint, "a12://", 6) == 0) && notify_wait(cpoint))
-				continue;
-		else
-#endif
 		arcan_timesleep(100);
 	}
 
