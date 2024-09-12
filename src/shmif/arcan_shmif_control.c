@@ -41,7 +41,7 @@
 #include <sys/un.h>
 
 #ifdef __LINUX
-#include <sys/inotify.h>
+#include <sys/syscalls.h>
 #endif
 
 #ifndef COUNT_OF
@@ -563,18 +563,18 @@ static bool notify_wait(const char* cpoint)
 
 	buf[pos] = '\0';
 
-	int notify = inotify_init1(IN_CLOEXEC);
+	int notify = sys_inotify_init1(IN_CLOEXEC);
 	if (-1 == notify)
 		return false;
 
 /* watch the path for changes */
-	if (-1 == inotify_add_watch(notify, buf, IN_CREATE)){
+	if (-1 == sys_inotify_add_watch(notify, buf, IN_CREATE)){
 		close(notify);
 		return false;
 	}
 
 /* just wait for something, the path shouldn't be particularly active */
-	struct inotify_event ev;
+	struct sys_inotify_event ev;
 	read(notify, &ev, sizeof(ev));
 
 	close(notify);
