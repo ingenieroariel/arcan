@@ -208,7 +208,6 @@ target_compile_definitions(arcan_tui PRIVATE ${TUI_DEFINITIONS})
 target_include_directories(arcan_tui PRIVATE ${TUI_INCLUDE_DIRS})
 
 target_link_libraries(arcan_shmif PRIVATE ${STDLIB} arcan_shmif_server_int)
-target_link_libraries(arcan_shmif_int PRIVATE ${STDLIB} arcan_shmif_server_int)
 target_link_libraries(arcan_shmif_ext PRIVATE ${STDLIB} ${VIDEO_LIBRARIES}
 	${AGP_LIBRARIES} ${HEADLESS_LIBRARIES} arcan_shmif)
 target_link_libraries(arcan_shmif_intext PRIVATE ${STDLIB} ${AGP_LIBRARIES}
