@@ -1,4 +1,4 @@
-# This is used by the main arcan build system to define the shmif platform
+H
 # and install targets, but also for some external projects that need to
 # do an in-source build of shmif- and its platform (automated build/
 # test systems etc) without a full installation.
@@ -168,10 +168,10 @@ endif()
 
 add_library(arcan_shmif_int STATIC ${SHMIF_SOURCES} ${SHMIF_PLATFORM})
 add_library(arcan_shmif_server_int STATIC ${SHMIF_SERVER_SOURCES})
-add_library(arcan_shmif SHARED ${SHMIF_SOURCES} ${SHMIF_PLATFORM})
-add_library(arcan_shmif_ext SHARED ${SHMIF_EXT_SOURCES})
-add_library(arcan_shmif_intext SHARED ${SHMIF_EXT_SOURCES})
-add_library(arcan_shmif_server SHARED ${SHMIF_SERVER_SOURCES} ${SHMIF_PLATFORM})
+add_library(arcan_shmif STATIC ${SHMIF_SOURCES} ${SHMIF_PLATFORM})
+add_library(arcan_shmif_ext STATIC ${SHMIF_EXT_SOURCES})
+add_library(arcan_shmif_intext STATIC ${SHMIF_EXT_SOURCES})
+add_library(arcan_shmif_server STATIC ${SHMIF_SERVER_SOURCES} ${SHMIF_PLATFORM})
 
 add_sanitizers(arcan_shmif_int arcan_shmif arcan_shmif_ext arcan_shmif_intext	arcan_shmif_server)
 
@@ -199,7 +199,7 @@ set(TUI_LIBRARIES arcan_shmif)
 # version in the font, or miss control over ligature substitutions and other
 # similar font features. Shape-break attribute is intended to mitigate that
 # somewhat.
-add_library(arcan_tui SHARED ${SHMIF_TUI_SOURCES})
+add_library(arcan_tui STATIC ${SHMIF_TUI_SOURCES})
 if (NOT TUI_RASTER_NO_TTF)
 	list(APPEND TUI_LIBRARIES ${FREETYPE_LIBRARIES})
 endif()

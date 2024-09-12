@@ -97,7 +97,7 @@ set(EXTERNAL_SOURCES
 	${ZSTD_SOURCES}
 )
 
-add_library(arcan_a12 SHARED ${A12_SOURCES} ${EXTERNAL_SOURCES})
+add_library(arcan_a12 STATIC ${A12_SOURCES} ${EXTERNAL_SOURCES})
 target_compile_definitions(arcan_a12 PRIVATE ${DEFS})
 
 set_target_properties(arcan_a12 PROPERTIES
