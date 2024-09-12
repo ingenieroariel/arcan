@@ -222,11 +222,6 @@ target_compile_definitions(arcan_shmif_server_int PRIVATE
 
 # note that we enable fpic for the static here as some
 # subdirectores need to pull it in as part of building a shared library
-set_target_properties(arcan_shmif_int PROPERTIES
-	COMPILE_FLAGS -fPIC
-	OUTPUT_NAME arcan_shmif
-	VERSION ${ASHMIF_MAJOR}.${ASHMIF_MINOR}
-)
 
 set_target_properties(arcan_shmif_server_int PROPERTIES
 	COMPILE_FLAGS -fPIC
@@ -264,9 +259,7 @@ set_target_properties(arcan_shmif_server PROPERTIES
 )
 
 set(ARCAN_SHMIF_INCLUDE_DIR ${ASD}/shmif PARENT_SCOPE)
-set(ARCAN_SHMIF_LIBRARY arcan_shmif_int ${STDLIB} PARENT_SCOPE)
 
-target_include_directories(arcan_shmif_int PRIVATE ${ASD}/shmif)
 target_include_directories(arcan_shmif PRIVATE ${ASD}/shmif)
 target_include_directories(arcan_shmif_server PRIVATE ${ASD}/shmif)
 
