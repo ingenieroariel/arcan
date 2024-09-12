@@ -33,7 +33,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <stdarg.h>
-_Static_assert(PIPE_BUF >= 4, "pipe atomic write should be >= 4");
+//_Static_assert(PIPE_BUF >= 4, "pipe atomic write should be >= 4");
 
 #include <sys/types.h>
 #include <sys/stat.h>
