@@ -654,7 +654,6 @@ else()
 		${VIDEO_LIBRARIES}
 		${AUDIO_LIBRARIES}
 		${AGP_LIBRARIES}
-		arcan_shmif_int
 		arcan_tui
 	)
 
@@ -724,7 +723,7 @@ else()
 		)
 		target_link_libraries(arcan_sdl
 			${STDLIB} ${ARCAN_LIBRARIES} ${VIDEO_LIBRARIES} ${AUDIO_LIBRARIES}
-			${AGP_LIBRARIES} arcan_shmif_int arcan_tui
+			${AGP_LIBRARIES} arcan_tui
 		)
 		list(APPEND BIN_INSTALL arcan_sdl)
 	endif()
@@ -772,7 +771,7 @@ else()
 		)
 		target_link_libraries(arcan_headless
 			${STDLIB} ${ARCAN_LIBRARIES} ${VIDEO_LIBRARIES} ${AUDIO_LIBRARIES}
-			${AGP_LIBRARIES} arcan_shmif_int arcan_tui
+			${AGP_LIBRARIES} arcan_tui
 		)
 		list(APPEND BIN_INSTALL arcan_headless)
 	endif()
