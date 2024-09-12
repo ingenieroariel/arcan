@@ -175,7 +175,6 @@ add_sanitizers(arcan_shmif_int arcan_shmif arcan_shmif_ext arcan_shmif_intext	ar
 
 if (NOT SHMIF_DISABLE_DEBUGIF)
 	target_compile_definitions(arcan_shmif PRIVATE SHMIF_DEBUG_IF)
-	target_compile_definitions(arcan_shmif_int PRIVATE SHMIF_DEBUG_IF)
 endif()
 
 # The TUI libraries / build setup is slated to change soonish when the TUI
