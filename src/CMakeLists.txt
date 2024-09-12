@@ -257,6 +257,10 @@ elseif ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang" AND NOT ENABLE_WALL_SPAM)
 	)
 endif()
 
+set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--no-whole-archive -Wl,--exclude-libs,ALL -lpthread")
+set(CMAKE_C_STANDARD_LIBRARIES "-lpthread")
+set(CMAKE_REQUIRED_LIBRARIES "")
+
 if (CMAKE_BUILD_TYPE STREQUAL "Profile")
 	amsg("${CL_WHT}------------------*Profile Build*------------------${CL_RST}")
 	add_definitions(-pg)
