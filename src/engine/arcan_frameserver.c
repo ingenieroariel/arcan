@@ -884,8 +884,7 @@ enum arcan_ffunc_rv arcan_frameserver_vdirect FFUNC_HEAD
 		if (g_buffers_locked == 1 || tgt->flags.locked)
 			goto no_out;
 
-		int buffer_status = push_buffer(tgt,
-			dst_store, shmpage->hints & SHMIF_RHINT_SUBREGION ? &dirty : NULL);
+		int buffer_status = -1;
 
 		if (-1 == buffer_status)
 			goto no_out;
@@ -1100,7 +1099,7 @@ enum arcan_ffunc_rv arcan_frameserver_avfeedframe FFUNC_HEAD
  * encode in the target framerate, it is up to the frameserver to determine
  * when to drop and when to double frames
  */
-			struct arcan_shmif_region reg;
+			//struct arcan_shmif_region reg;
 			if (src->desc.region_valid)
 				reg = src->desc.region;
 			else
