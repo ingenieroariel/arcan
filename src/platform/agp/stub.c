@@ -144,7 +144,7 @@ void agp_activate_vstore_multi(struct agp_vstore** backing, size_t n)
 
 void agp_update_vstore(struct agp_vstore* s, bool copy)
 {
-	FLAG_DIRTY();
+	FLAG_DIRTY(0);
 }
 
 void agp_prepare_stencil()
