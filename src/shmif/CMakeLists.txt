@@ -1,4 +1,4 @@
-# and install targets, but also for some external projects that need to
+h and install targets, but also for some external projects that need to
 # do an in-source build of shmif- and its platform (automated build/
 # test systems etc) without a full installation.
 #
@@ -164,7 +164,6 @@ if (NOT SHMIF_DISABLE_DEBUGIF)
 	list(APPEND SHMIF_SOURCES ${ASD}/shmif/arcan_shmif_debugif.c)
 endif()
 
-add_library(arcan_shmif_server_int STATIC ${SHMIF_SERVER_SOURCES})
 add_library(arcan_shmif STATIC ${SHMIF_SOURCES} ${SHMIF_PLATFORM})
 add_library(arcan_shmif_ext STATIC ${SHMIF_EXT_SOURCES})
 add_library(arcan_shmif_intext STATIC ${SHMIF_EXT_SOURCES})
@@ -205,7 +204,6 @@ set_target_properties(arcan_tui PROPERTIES VERSION ${ASHMIF_MAJOR}.${ASHMIF_MINO
 target_compile_definitions(arcan_tui PRIVATE ${TUI_DEFINITIONS})
 target_include_directories(arcan_tui PRIVATE ${TUI_INCLUDE_DIRS})
 
-target_link_libraries(arcan_shmif PRIVATE ${STDLIB} arcan_shmif_server_int)
 target_link_libraries(arcan_shmif_ext PRIVATE ${STDLIB} ${VIDEO_LIBRARIES}
 	${AGP_LIBRARIES} ${HEADLESS_LIBRARIES} arcan_shmif)
 target_link_libraries(arcan_shmif_intext PRIVATE ${STDLIB} ${AGP_LIBRARIES}
@@ -215,18 +213,9 @@ target_link_libraries(arcan_shmif_server PRIVATE ${STDLIB} arcan_shmif_ext)
 target_include_directories(arcan_shmif_ext PRIVATE ${INCLUDE_DIRS})
 target_include_directories(arcan_shmif_intext PRIVATE ${INCLUDE_DIRS})
 target_include_directories(arcan_shmif_server PRIVATE ${INCLUDE_DIRS})
-target_include_directories(arcan_shmif_server_int PRIVATE ${INCLUDE_DIRS} ${ASD}/shmif)
-target_compile_definitions(arcan_shmif_server_int PRIVATE
-	SHMIFSRV_EXTERNAL_CLOCK PLATFORM_FRAMESERVER_NOAMEM)
 
 # note that we enable fpic for the static here as some
 # subdirectores need to pull it in as part of building a shared library
-
-set_target_properties(arcan_shmif_server_int PROPERTIES
-	COMPILE_FLAGS -fPIC
-	OUTPUT_NAME arcan_shmif_server
-	VERSION ${ASHMIF_MAJOR}.${ASHMIF_MINOR}
-)
 
 if (CMAKE_C_FLAGS)
 	string (REGEX REPLACE "-fsanitize=[^ ]+" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
