@@ -62,7 +62,7 @@ find_package(RT REQUIRED)
 # find_package(DL REQUIRED)
 find_package(Atomic REQUIRED)
 
-set(STDLIB Threads::Threads Math::Math RT::RT DL::DL Atomic::Atomic)
+set(STDLIB "")
 
 if (CMAKE_COLOR_MAKEFILE)
 	include(CMakeColor)
