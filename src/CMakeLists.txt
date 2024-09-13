@@ -50,6 +50,8 @@ set(SHARED_PERMISSIONS_DIR OWNER_WRITE OWNER_READ GROUP_WRITE
 include(ExternalProject)
 include(CheckIncludeFiles)
 
+set(CMAKE_DL_LIBS "")
+
 find_package(PkgConfig REQUIRED)
 find_package(Sanitizers REQUIRED)
 
@@ -57,7 +59,7 @@ find_package(Sanitizers REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Math REQUIRED)
 find_package(RT REQUIRED)
-find_package(DL REQUIRED)
+# find_package(DL REQUIRED)
 find_package(Atomic REQUIRED)
 
 set(STDLIB Threads::Threads Math::Math RT::RT DL::DL Atomic::Atomic)
