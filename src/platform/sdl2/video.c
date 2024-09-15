@@ -59,7 +59,7 @@ static char* envopts[] = {
 
 void platform_video_shutdown()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	SDL_GL_SwapWindow(sdl.screen);
 	SDL_DestroyWindow(sdl.screen);
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
@@ -129,8 +129,8 @@ static bool rebuild_screen()
 	update_refresh();
 
 	SDL_GL_CreateContext(sdl.screen);
-	glViewport(0, 0, sdl.canvasw, sdl.canvash);
-	glScissor(0, 0, sdl.canvasw, sdl.canvash);
+	//glViewport(0, 0, sdl.canvasw, sdl.canvash);
+	//glScissor(0, 0, sdl.canvasw, sdl.canvash);
 
 	return true;
 }
@@ -475,7 +475,7 @@ bool platform_video_display_id(platform_display_id id,
 const char* platform_video_capstr()
 {
 	static char* capstr;
-
+/*
 	if (!capstr){
 		const char* vendor = (const char*) glGetString(GL_VENDOR);
 		const char* render = (const char*) glGetString(GL_RENDERER);
@@ -499,7 +499,7 @@ const char* platform_video_capstr()
 		else
 			capstr = interim;
 	}
-
+*/
 	return capstr;
 }
 
