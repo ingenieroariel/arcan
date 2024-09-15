@@ -63,10 +63,6 @@ static void synch_oracle(struct a11y_meta* M, struct arcan_shmif_cont* P)
 	};
 
 /* this goes away when we can have a futex to kqueue on */
-	while ( (rv = shmifsrv_put_video(M->oracle, &vb) ) == 0 )
-	{
-		arcan_timesleep(1);
-	}
 
 /* this is OUTPUT so VFRAME ready doesn't really help,
  * we want STEPFRAME to know if the MESSAGE events are complete. */
