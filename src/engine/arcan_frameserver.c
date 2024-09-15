@@ -1145,35 +1145,6 @@ enum arcan_ffunc_rv arcan_frameserver_avfeedframe FFUNC_HEAD
 /* this will cause the first frame to be deferred in delivery, if latency
  * is important the prior processing need to push multiple updates even if
  * no change to prime the chain. */
-				bool swap = false;
-				struct agp_vstore* vs = agp_rendertarget_swap(tgt->art, &swap);
-				if (!swap){
-					goto no_out;
-				}
-
-				if (1 != (np =
-					platform_video_export_vstore(vs, planes, COUNT_OF(planes)))){
-					arcan_warning(
-						"Platform rejected export of (%"PRIxVOBJ"), revert shm", 1);
-					tgt->hwreadback = false;
-				}
-/* only export the plane- descriptor and not the fence, as we are locked into a
- * 1-event-1-fd and the variants of fd slots % 4 != 0 versus having the
- * aforementioned allocation scheme aren't worh it, especially since OUTPUT
- * doesn't permit resize. */
-				else {
-					platform_fsrv_pushfd(src, &ev, planes[0].fd);
-				}
-
-/* after export we don't need the created handles, ownership goes to recpt. */
-				if (np){
-					for (size_t i = 0; i < np; i++){
-						if (-1 != planes[i].fd)
-							close(planes[i].fd);
-						if (-1 != planes[i].fence)
-							close(planes[i].fence);
-					}
-				}
 			}
 
 			if (src->desc.callback_framestate)
