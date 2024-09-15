@@ -5304,8 +5304,6 @@ static size_t process_rendertarget(
 /* this does not really swap the stores unless they are actually different, it
  * is cheaper to do it here than shareglstore as the search for vobj to rtgt is
  * expensive */
-	if (tgt->color && !nest)
-		agp_rendertarget_swapstore(tgt->art, tgt->color->vstore);
 
 	current_rendertarget = tgt;
 	agp_activate_rendertarget(tgt->art);
