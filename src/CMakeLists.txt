@@ -55,6 +55,7 @@ set(CMAKE_DL_LIBS "")
 find_package(PkgConfig REQUIRED)
 find_package(Sanitizers REQUIRED)
 
+find_package(Xau REQUIRED)
 find_package(XCB REQUIRED)
 find_package(X11 REQUIRED)
 # not pretty, but as a quick 'pending build system rewrite' thing
