@@ -57,7 +57,6 @@ find_package(Sanitizers REQUIRED)
 
 
 pkg_check_modules(Xau REQUIRED xau)
-pkg_check_modules(perror REQUIRED perror)
 
 find_package(XCB REQUIRED)
 find_package(X11 REQUIRED)
@@ -447,6 +446,7 @@ else()
 		ARCAN_LIBRARIES
 		${FREETYPE_DEFAULT_LIBRARIES}
 		${XCB_DEFAULT_LIBRARIES}
+		${Xau_LIBRARIES}
 		${X11_DEFAULT_LIBRARIES}
 		${SDL_DEFAULT_LIBRARIES}
 		${LUA_LIBRARIES}
@@ -458,6 +458,7 @@ else()
 		${LUA_INCLUDE_DIR}
 		${LUA_INCLUDE_DIRS}
 		${FREETYPE_DEFAULT_INCLUDE_DIRS}
+		${Xau_INCLUDE_DIRS}
 		${XCB_DEFAULT_INCLUDE_DIRS}
 		${X11_DEFAULT_INCLUDE_DIRS}
 		${SQLite3_INCLUDE_DIR}
