@@ -64,6 +64,10 @@ find_package(RT REQUIRED)
 # find_package(DL REQUIRED)
 find_package(Atomic REQUIRED)
 
+set(XCB_DEFAULT_LIBRARIES ${XCB_LIBRARIES})
+set(XCB_DEFAULT_INCLUDE_DIRS ${XCB_INCLUDE_DIRS})
+
+
 set(STDLIB "")
 
 if (CMAKE_COLOR_MAKEFILE)
@@ -438,6 +442,9 @@ else()
 	LIST (APPEND
 		ARCAN_LIBRARIES
 		${FREETYPE_DEFAULT_LIBRARIES}
+		${XCB_DEFAULT_LIBRARIES}
+		${X11_DEFAULT_LIBRARIES}
+		${SDL_DEFAULT_LIBRARIES}
 		${LUA_LIBRARIES}
 		${SQLite3_LIBRARIES}
 	)
@@ -447,6 +454,8 @@ else()
 		${LUA_INCLUDE_DIR}
 		${LUA_INCLUDE_DIRS}
 		${FREETYPE_DEFAULT_INCLUDE_DIRS}
+		${XCB_DEFAULT_INCLUDE_DIRS}
+		${X11_DEFAULT_INCLUDE_DIRS}
 		${SQLite3_INCLUDE_DIR}
 		${CMAKE_CURRENT_SOURCE_DIR}/platform
 		${EXTERNAL_SRC_DIR}
@@ -547,8 +556,6 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
  else()
 	message(FATAL_ERROR "${CL_RED}Unsupported OS(${CMAKE_SYSTEM_NAME}) detected, abandon ship!${CL_RST}")
 endif()
-
-pkg_check_modules(XCB REQUIRED)  # Add more components as needed
 
 
 # XKB might be necessary to deal with nested clients of all platform types
