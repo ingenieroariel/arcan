@@ -547,7 +547,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	message(FATAL_ERROR "${CL_RED}Unsupported OS(${CMAKE_SYSTEM_NAME}) detected, abandon ship!${CL_RST}")
 endif()
 
-pkg_check_modules(XCB REQUIRED xcb xcb-randr xcb-xinerama xcb-x11-xcb xcb-xkb)  # Add more components as needed
+pkg_check_modules(XCB REQUIRED)  # Add more components as needed
 
 
 # XKB might be necessary to deal with nested clients of all platform types
