@@ -56,7 +56,6 @@ find_package(PkgConfig REQUIRED)
 find_package(Sanitizers REQUIRED)
 
 find_package(X11 REQUIRED)
-find_package(XCB REQUIRED)
 # not pretty, but as a quick 'pending build system rewrite' thing
 find_package(Threads REQUIRED)
 find_package(Math REQUIRED)
@@ -548,12 +547,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	message(FATAL_ERROR "${CL_RED}Unsupported OS(${CMAKE_SYSTEM_NAME}) detected, abandon ship!${CL_RST}")
 endif()
 
-pkg_check_modules(XCB REQUIRED xcb)
-if (XCB_FOUND)
-	list(APPEND ARCAN_DEFINITIONS HAVE_XCB)
-	list(APPEND ARCAN_LIBRARIES ${XCB_LINK_LIBRARIES})
-	list(APPEND INCLUDE_DIRS ${XCB_INCLUDE_DIRS})
-endif()
+pkg_check_modules(XCB REQUIRED xcb xcb-randr xcb-xinerama xcb-x11-xcb xcb-xkb)  # Add more components as needed
 
 
 # XKB might be necessary to deal with nested clients of all platform types
@@ -669,6 +663,7 @@ else()
 		${ARCAN_DEFINITIONS}
 		${ARCAN_NOLWA_DEFINITIONS}
 		${PLATFORM_DEFINITIONS}
+		${XCB_CFLAGS_OTHER}
 		ARCAN_BUILDVERSION=\"${SOURCE_TAG}-${PLATFORM_BUILDTAG}-${CMAKE_SYSTEM_NAME}\"
 		FRAMESERVER_MODESTRING=\"${FRAMESERVER_MODESTRING}\"
 	)
