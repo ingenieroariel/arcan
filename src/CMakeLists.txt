@@ -355,6 +355,7 @@ if (CLIENT_LIBRARY_BUILD OR BUILD_PRESET STREQUAL "client")
 		${CMAKE_CURRENT_SOURCE_DIR}/engine
 		${CMAKE_CURRENT_SOURCE_DIR}/platform
 		${FREETYPE_DEFAULT_INCLUDE_DIRS}
+
 	)
 else()
 	find_package(Freetype REQUIRED QUIET)
@@ -654,7 +655,7 @@ else()
 	endif()
 
 	set(PLATFORM_BUILDTAG ${VIDEO_PLATFORM}-${AGP_PLATFORM}-${AUDIO_PLATFORM}-${INPUT_PLATFORM}-${LUA_TAG}-${DISTR_TAG})
-	target_include_directories(arcan PRIVATE ${INCLUDE_DIRS})
+	target_include_directories(arcan PRIVATE ${X11_INCLUDE} ${INCLUDE_DIRS})
 	target_compile_definitions(arcan PRIVATE
 		${ARCAN_DEFINITIONS}
 		${ARCAN_NOLWA_DEFINITIONS}
@@ -669,6 +670,7 @@ else()
 		${VIDEO_LIBRARIES}
 		${AUDIO_LIBRARIES}
 		${AGP_LIBRARIES}
+		${X11_LIBRARIES}
 		arcan_tui
 	)
 
