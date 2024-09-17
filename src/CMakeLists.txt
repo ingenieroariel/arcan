@@ -57,6 +57,7 @@ find_package(Sanitizers REQUIRED)
 
 
 pkg_check_modules(Xau REQUIRED xau)
+pkg_check_modules(perror REQUIRED perror)
 
 find_package(XCB REQUIRED)
 find_package(X11 REQUIRED)
