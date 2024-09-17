@@ -56,7 +56,6 @@ find_package(PkgConfig REQUIRED)
 find_package(Sanitizers REQUIRED)
 
 find_package(X11 REQUIRED)
-find_package(xcb REQUIRED)
 # not pretty, but as a quick 'pending build system rewrite' thing
 find_package(Threads REQUIRED)
 find_package(Math REQUIRED)
@@ -548,6 +547,14 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	message(FATAL_ERROR "${CL_RED}Unsupported OS(${CMAKE_SYSTEM_NAME}) detected, abandon ship!${CL_RST}")
 endif()
 
+pkg_check_modules(XCB REQUIRED xcb)
+if (XCB_FOUND)
+	list(APPEND ARCAN_DEFINITIONS HAVE_XCB)
+	list(APPEND ARCAN_LIBRARIES ${XCB_LINK_LIBRARIES})
+	list(APPEND INCLUDE_DIRS ${XCB_INCLUDE_DIRS})
+endif()
+
+
 # XKB might be necessary to deal with nested clients of all platform types
 # and near necessary for wayland and x11 clients.
 pkg_check_modules(XKB QUIET xkbcommon)
@@ -656,12 +663,11 @@ else()
 	endif()
 
 	set(PLATFORM_BUILDTAG ${VIDEO_PLATFORM}-${AGP_PLATFORM}-${AUDIO_PLATFORM}-${INPUT_PLATFORM}-${LUA_TAG}-${DISTR_TAG})
-	target_include_directories(arcan PRIVATE ${XCB_INCLUDE} ${X11_INCLUDE} ${INCLUDE_DIRS})
+	target_include_directories(arcan PRIVATE ${X11_INCLUDE} ${INCLUDE_DIRS})
 	target_compile_definitions(arcan PRIVATE
 		${ARCAN_DEFINITIONS}
 		${ARCAN_NOLWA_DEFINITIONS}
 		${PLATFORM_DEFINITIONS}
-		${XCB_DEFINITIONS}
 		ARCAN_BUILDVERSION=\"${SOURCE_TAG}-${PLATFORM_BUILDTAG}-${CMAKE_SYSTEM_NAME}\"
 		FRAMESERVER_MODESTRING=\"${FRAMESERVER_MODESTRING}\"
 	)
@@ -672,7 +678,6 @@ else()
 		${VIDEO_LIBRARIES}
 		${AUDIO_LIBRARIES}
 		${AGP_LIBRARIES}
-		${XCB_LIBRARIES}
 		${X11_LIBRARIES}
 		arcan_tui
 	)
