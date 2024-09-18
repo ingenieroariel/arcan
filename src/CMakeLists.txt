@@ -708,8 +708,6 @@ else()
 	# Some cleanup possible by defining a function for taking [a,v,e,o] and
 	# storing into a source/include/lib dir so that we can do that for both
 	# arcan, the hybrids and lwa at the same time.
-	if(VIDEO_PLATFORM STREQUAL "egl-dri")
-	if(HYBRID_SDL)
 		set_property(
 			SOURCE engine/arcan_main.c
 			APPEND PROPERTY COMPILE_DEFINITIONS
@@ -761,58 +759,6 @@ else()
 			${AGP_LIBRARIES} arcan_tui
 		)
 		list(APPEND BIN_INSTALL arcan_sdl)
-	endif()
-
-	# Hybrid headless is to allow an arcan setup where the normal egl drivers
-	# etc. are being used, but the input platform is exposed as an connection
-	# point in order to use it as a render server or client 'host' for remote
-	# desktop like situations.
-	if (HYBRID_HEADLESS)
-		amsg("-- Appending headless platform build--")
-		set(VIDEO_PLATFORM headless)
-		set(ARCAN_DEFINITIONS "")
-		include(${PLATFORM_ROOT}/cmake/CMakeLists.Video)
-
-	# HACK: Force- remove the psep-open from the platform and switch to the open
-		list(FIND ARCAN_PLATFORM "${PLATFORM_ROOT}/posix/psep_open.c" _index)
-		if (${_index} GREATER -1)
-			list(REMOVE_AT ARCAN_PLATFORM ${_index})
-			list(APPEND ARCAN_PLATFORM ${PLATFORM_ROOT}/posix/open.c)
-		endif()
-
-		list(APPEND BIN_INSTALL arcan_headless)
-		add_executable(arcan_headless
-			${SOURCES}
-			${ARCAN_PLATFORM}
-			${AGP_SOURCES}
-			${PLATFORM_SOURCES}
-			${VIDEO_PLATFORM_SOURCES}
-			${AUDIO_PLATFORM_SOURCES}
-			${PLATFORM_ROOT}/headless/event.c
-		)
-		if (MAIN_DEPS)
-			add_dependencies(arcan_headless ${MAIN_DEPS})
-		endif()
-		target_include_directories(arcan_headless PRIVATE ${INCLUDE_DIRS})
-
-		set(PLATFORM_BUILDTAG headless-${AGP_PLATFORM}-${AUDIO_PLATFORM}-headless-${LUA_TAG}-${DISTR_TAG})
-		target_compile_definitions(arcan_headless PRIVATE
-			${ARCAN_DEFINITIONS}
-			${ARCAN_NOLWA_DEFINITIONS}
-			${PLATFORM_DEFINITIONS}
-			ARCAN_HEADLESS
-			FRAMESERVER_MODESTRING=\"${FRAMESERVER_MODESTRING}\"
-			ARCAN_BUILDVERSION=\"${SOURCE_TAG}-${PLATFORM_BUILDTAG}-${CMAKE_SYSTEM_NAME}\"
-		)
-		target_link_libraries(arcan_headless
-			${STDLIB} ${ARCAN_LIBRARIES} ${VIDEO_LIBRARIES} ${AUDIO_LIBRARIES}
-			${AGP_LIBRARIES} arcan_tui
-		)
-		list(APPEND BIN_INSTALL arcan_headless)
-	endif()
-		set(VIDEO_PLATFORM egl-dri)
-	endif() #egl-dri
-
 	#
 	# The database tool is a CLI for the engine/arcan_db with additional
 	# code not part of the main arcan binaries (to make it somewhat harder
