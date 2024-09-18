@@ -744,7 +744,7 @@ else()
 		if (MAIN_DEPS)
 			add_dependencies(arcan_sdl ${MAIN_DEPS})
 		endif()
-		target_include_directories(arcan_sdl PRIVATE ${INCLUDE_DIRS})
+		target_include_directories(arcan_sdl PRIVATE ${INCLUDE_DIRS} ${X11_LIBRARIES} ${Xau_LIBRARIES} ${XCB_LIBRARIES})
 
 		set(PLATFORM_BUILDTAG sdl2-${AGP_PLATFORM}-sdl2-sdl2-${LUA_TAG}-${DISTR_TAG})
 		target_compile_definitions(arcan_sdl PRIVATE
@@ -756,6 +756,7 @@ else()
 		)
 		target_link_libraries(arcan_sdl
 			${STDLIB} ${ARCAN_LIBRARIES} ${VIDEO_LIBRARIES} ${AUDIO_LIBRARIES}
+			${XCB_LIBRARIES} ${X11_LIBRARIES} ${Xau_LIBRARIES} ${XCB_LIBRARIES}
 			${AGP_LIBRARIES} arcan_tui
 		)
 		list(APPEND BIN_INSTALL arcan_sdl)
