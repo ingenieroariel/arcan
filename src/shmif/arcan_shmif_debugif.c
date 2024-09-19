@@ -1505,9 +1505,12 @@ static void build_process_str(FILE* fout)
 static void set_process_window(struct debug_ctx* dctx)
 {
 /* build a process description string that we periodically update */
-	char* buf = NULL;
-	size_t buf_sz = 0;
-	FILE* outf = open_memstream(&buf, &buf_sz);
+	char* buf = NULL;      // Buffer pointer
+	size_t buf_sz = 0;     // Size of the buffer
+	FILE* outf;
+
+	// Use fmemopen with NULL buffer and size 0
+	outf = fmemopen(NULL, 0, "w+"); // "w+" opens for reading and writing
 	if (!outf)
 		return;
 
@@ -1516,18 +1519,36 @@ static void set_process_window(struct debug_ctx* dctx)
 
 	build_process_str(outf);
 	fflush(outf);
+	
+	// Determine the size of the data written
+	fseek(outf, 0, SEEK_END);
+	buf_sz = ftell(outf);
+	rewind(outf);
+
+	// Allocate buffer to hold the data
+	buf = malloc(buf_sz + 1); // +1 for null terminator
+	if (!buf) {
+		fclose(outf);
+		return;
+	}
+
+	// Read the data from the stream into the buffer
+	fread(buf, 1, buf_sz, outf);
+	buf[buf_sz] = '\0'; // Null-terminate the string
+
+	fclose(outf); // Close the stream
+
+	// Now use buf as needed
 	struct tui_bufferwnd_opts opts = {
-		.read_only = true,
-		.view_mode = BUFFERWND_VIEW_ASCII,
-		.wrap_mode = BUFFERWND_WRAP_ACCEPT_LF,
-		.allow_exit = true
+        .read_only = true,
+        .view_mode = BUFFERWND_VIEW_ASCII,
+        .wrap_mode = BUFFERWND_WRAP_ACCEPT_LF,
+        .allow_exit = true
 	};
 
-	run_buffer(dctx->tui, (uint8_t*) buf, buf_sz, opts, "process");
-/* check return code and update if commit */
+	run_buffer(dctx->tui, (uint8_t*)buf, buf_sz, opts, "process");
 
-	if (outf)
-		fclose(outf);
+/* free allocated buffer */
 	free(buf);
 }
 
