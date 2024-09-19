@@ -33,17 +33,6 @@
 #include "nbio.h"
 #include "nbio_local.h"
 
-#include <stddef.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-/* Create a named pipe (FIFO) named PATH with protections MODE.  */
-int
-mkfifo (const char *path, mode_t mode)
-{
-  return mknod (path, mode | S_IFIFO, 0);
-}
-
-
 #if LUA_VERSION_NUM == 501
 	#define lua_rawlen(x, y) lua_objlen(x, y)
 #endif
@@ -109,7 +98,48 @@ extern unsigned long long arcan_timemillis();
 
 static bool ensure_flush(lua_State* L, struct nonblock_io* ib, size_t timeout)
 {
-	return false;
+	bool rv = true;
+	struct pollfd fd = {
+		.fd = ib->fd,
+		.events = POLLOUT | POLLERR | POLLHUP | POLLNVAL
+	};
+
+/* since poll doesn't give much in terms of feedback across calls some crude
+ * timekeeping is needed to make sure we don't exceed a timeout by too much */
+	unsigned long long current = arcan_timemillis();
+	int status;
+
+/* writes can fail.. */
+	while ((status = alt_nbio_process_write(L, ib)) == 0){
+
+		if (timeout > 0){
+			unsigned long long now = arcan_timemillis();
+			if (now > current)
+				timeout -= now - current;
+			current = now;
+
+			if (timeout <= 0){
+				rv = false;
+				break;
+			}
+		}
+
+/* dst can die while waiting for write-state */
+		int rv = poll(&fd, 1, timeout);
+
+		if (-1 == rv && (errno == EAGAIN || errno == EINTR))
+				continue;
+
+		if (fd.revents & (POLLERR | POLLHUP | POLLNVAL)){
+			rv = false;
+			break;
+		}
+	}
+
+	if (status < 0)
+		rv = false;
+
+	return rv;
 }
 
 static int connect_trypath(const char* local, const char* remote, int type)
@@ -1016,7 +1046,7 @@ static struct pathfd build_fifo_ipc(char* path, bool userns, bool expect_write)
 	struct stat fi;
 	if (-1 == stat(path, &fi)){
 		if (expect_write){
-			if (-1 ==mkfifo(workpath, S_IRWXU)){
+			if (-1 == mkfifo(workpath, S_IRWXU)){
 				arcan_mem_free(workpath);
 				res.err = "Couldn't build FIFO";
 				return res;

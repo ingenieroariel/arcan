@@ -1093,6 +1093,25 @@ static void rebuild_index()
 	if (active_clients.dirlist)
 		free(active_clients.dirlist);
 
+	FILE* dirlist = open_memstream(
+		&active_clients.dirlist, &active_clients.dirlist_sz);
+	volatile struct appl_meta* cur = &active_clients.opts->dir;
+	while (cur){
+		if (cur->appl.name[0]){
+			fprintf(dirlist,
+				"kind=appl:name=%s:id=%"PRIu16":size=%"PRIu64
+				":categories=%"PRIu16":hash=%"PRIx8
+				"%"PRIx8"%"PRIx8"%"PRIx8":timestamp=%"PRIu64":description=%s\n",
+				cur->appl.name, cur->identifier, cur->buf_sz, cur->categories,
+				cur->hash[0], cur->hash[1], cur->hash[2], cur->hash[3],
+				cur->update_ts,
+				cur->appl.short_descr
+			);
+		}
+		cur = cur->next;
+	}
+
+	fclose(dirlist);
 }
 
 void anet_directory_shmifsrv_set(struct anet_dirsrv_opts* opts)

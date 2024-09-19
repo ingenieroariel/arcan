@@ -871,7 +871,7 @@ enum arcan_ffunc_rv arcan_frameserver_vdirect FFUNC_HEAD
  * find the related vstore and if not, the default */
 		struct agp_vstore* dst_store = vobj->frameset ?
 			vobj->frameset->frames[vobj->frameset->index].frame : vobj->vstore;
-		//struct arcan_shmif_region dirty = atomic_load(&shmpage->dirty);
+		struct arcan_shmif_region dirty = atomic_load(&shmpage->dirty);
 
 /* while we're here, check if audio should be processed as well */
 		do_aud = (atomic_load(&tgt->shm.ptr->aready) > 0 &&
@@ -884,7 +884,8 @@ enum arcan_ffunc_rv arcan_frameserver_vdirect FFUNC_HEAD
 		if (g_buffers_locked == 1 || tgt->flags.locked)
 			goto no_out;
 
-		int buffer_status = -1;
+		int buffer_status = push_buffer(tgt,
+			dst_store, shmpage->hints & SHMIF_RHINT_SUBREGION ? &dirty : NULL);
 
 		if (-1 == buffer_status)
 			goto no_out;
@@ -1099,16 +1100,16 @@ enum arcan_ffunc_rv arcan_frameserver_avfeedframe FFUNC_HEAD
  * encode in the target framerate, it is up to the frameserver to determine
  * when to drop and when to double frames
  */
-			//struct arcan_shmif_region reg;
-			//if (src->desc.region_valid)
-			//	reg = src->desc.region;
-			//else
-			//	reg = (struct arcan_shmif_region){
-			//		.x2 = src->desc.width, .y2 = src->desc.height
-			//	};
+			struct arcan_shmif_region reg;
+			if (src->desc.region_valid)
+				reg = src->desc.region;
+			else
+				reg = (struct arcan_shmif_region){
+					.x2 = src->desc.width, .y2 = src->desc.height
+				};
 
 			atomic_store(&src->shm.ptr->vpts, arcan_timemillis());
-			//atomic_store(&src->shm.ptr->dirty, reg);
+			atomic_store(&src->shm.ptr->dirty, reg);
 
 	/* only mark vready if we go the manual buffer route, otherwise the device
 	 * events act as clock */
@@ -1145,6 +1146,35 @@ enum arcan_ffunc_rv arcan_frameserver_avfeedframe FFUNC_HEAD
 /* this will cause the first frame to be deferred in delivery, if latency
  * is important the prior processing need to push multiple updates even if
  * no change to prime the chain. */
+				bool swap = false;
+				struct agp_vstore* vs = agp_rendertarget_swap(tgt->art, &swap);
+				if (!swap){
+					goto no_out;
+				}
+
+				if (1 != (np =
+					platform_video_export_vstore(vs, planes, COUNT_OF(planes)))){
+					arcan_warning(
+						"Platform rejected export of (%"PRIxVOBJ"), revert shm", 1);
+					tgt->hwreadback = false;
+				}
+/* only export the plane- descriptor and not the fence, as we are locked into a
+ * 1-event-1-fd and the variants of fd slots % 4 != 0 versus having the
+ * aforementioned allocation scheme aren't worh it, especially since OUTPUT
+ * doesn't permit resize. */
+				else {
+					platform_fsrv_pushfd(src, &ev, planes[0].fd);
+				}
+
+/* after export we don't need the created handles, ownership goes to recpt. */
+				if (np){
+					for (size_t i = 0; i < np; i++){
+						if (-1 != planes[i].fd)
+							close(planes[i].fd);
+						if (-1 != planes[i].fence)
+							close(planes[i].fence);
+					}
+				}
 			}
 
 			if (src->desc.callback_framestate)

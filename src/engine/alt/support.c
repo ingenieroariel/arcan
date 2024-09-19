@@ -234,7 +234,28 @@ void alt_fatal(const char* msg, ...)
 
 	char* buf;
 	size_t buf_sz;
-	alt_trace_set_crash_source("couldn't build stream");
+	FILE* stream = open_memstream(&buf, &buf_sz);
+	if (stream){
+		va_start(args, msg);
+
+/* With LWA we shouldn't format the crash source as it will go to last_words
+ * first, and arcan will treat the message as garbage. The use of
+ * open_memstream here will leak the length of the crash source but we'd rather
+ * want it in bound memory in case of an unexpected crash and being able to
+ * recover this. */
+#ifndef ARCAN_LWA
+			fprintf(stream, "\x1b[0m\n");
+#endif
+			vfprintf(stream, msg, args);
+			fprintf(stream, "\n");
+			alt_trace_callstack(L, stream);
+			fflush(stream);
+			alt_trace_set_crash_source(buf);
+			fclose(stream);
+		va_end(args);
+	}
+	else
+		alt_trace_set_crash_source("couldn't build stream");
 
 	fatal_handover(L);
 
@@ -262,7 +283,27 @@ static void wraperr(lua_State* L, int errc, const char* src)
 	arcan_state_dump("crash", mesg, src);
 	char* buf;
 	size_t buf_sz;
-	alt_trace_set_crash_source(mesg);
+	FILE* stream = open_memstream(&buf, &buf_sz);
+
+	if (stream){
+		if (lua_debug_level){
+			fprintf(stream, "Warning: wraperr((), %s, from %s\n", mesg, src);
+			alt_trace_callstack(L, stream);
+			dump_stack(L, stream);
+		}
+
+		fprintf(stream, "\n\x1b[1mScript failure:\n \x1b[32m %s\n"
+		"\x1b[39mC-entry point: \x1b[32m %s \x1b[39m\x1b[0m.\n", mesg, src);
+
+		fprintf(stream,
+			"\nHanding over to recovery script (or shutdown if none present).\n");
+
+		fflush(stream);
+		alt_trace_set_crash_source(buf);
+		fclose(stream);
+	}
+	else
+		alt_trace_set_crash_source(mesg);
 
 /* first try cooperative script error recovery */
 	fatal_handover(L);

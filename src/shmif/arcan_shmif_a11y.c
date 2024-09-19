@@ -31,6 +31,10 @@ static void synch_oracle(struct a11y_meta* M, struct arcan_shmif_cont* P)
  * it currently doesn't.
  */
 /* MISSING: should attach LANG= to provide GEOHINT to direct language used */
+	if (M->oracle && (M->w != P->w || M->h != P->h)){
+		shmifsrv_free(M->oracle, 0);
+		M->oracle = NULL;
+	}
 
 	if (!M->oracle){
 		char envarg[1024] = "ARCAN_ARG=proto=ocr";
@@ -46,9 +50,20 @@ static void synch_oracle(struct a11y_meta* M, struct arcan_shmif_cont* P)
 		};
 
 		int clsock = -1;
-		return;
+		M->oracle = shmifsrv_spawn_client(env, &clsock, NULL, 0);
+		if (!M->oracle){
+			M->oracle_fail = true;
+			return;
+		}
+
 /* ensure we send ACTIVATE or _encode will consume the STEPFRAME
  * event and the client will be dangling waiting for it */
+		while ((pv = shmifsrv_poll(M->oracle) >= 0)){
+			while (shmifsrv_dequeue_events(M->oracle, &ev, 1) == 1){
+			}
+			if (pv == 1)
+				break;
+		}
 
 		M->w = P->w;
 		M->h = P->h;
@@ -63,9 +78,37 @@ static void synch_oracle(struct a11y_meta* M, struct arcan_shmif_cont* P)
 	};
 
 /* this goes away when we can have a futex to kqueue on */
+	while ( (rv = shmifsrv_put_video(M->oracle, &vb) ) == 0 )
+	{
+		arcan_timesleep(1);
+	}
 
 /* this is OUTPUT so VFRAME ready doesn't really help,
  * we want STEPFRAME to know if the MESSAGE events are complete. */
+	while ((pv = shmifsrv_poll(M->oracle) >= 0)){
+		while (shmifsrv_dequeue_events(M->oracle, &ev, 1) == 1){
+			if (ev.category == EVENT_EXTERNAL
+				&& ev.ext.kind == EVENT_EXTERNAL_MESSAGE){
+				bool bad;
+				char* out;
+				if (shmifsrv_merge_multipart_message(M->oracle, &ev, &out, &bad)){
+					if (bad)
+						continue;
+
+					arcan_tui_move_to(M->tui, 0, 0);
+					arcan_tui_printf(M->tui, NULL, "%s", out);
+				}
+			}
+		}
+		if (pv == 1)
+			break;
+	}
+
+	if (pv == -1){
+		shmifsrv_free(M->oracle, 0);
+		M->oracle = NULL;
+		M->oracle_fail = true;
+	}
 }
 
 static void on_state(struct arcan_shmif_cont* p, int state)
@@ -91,6 +134,9 @@ static void on_state(struct arcan_shmif_cont* p, int state)
 /* could forward last_words as well, but it's likely the outer-wm would
  * have this as part of a notification / window handling system that is
  * accessible already so we don't need to do that here */
+		if (M->oracle){
+			shmifsrv_free(M->oracle, SHMIFSRV_FREE_NO_DMS);
+		}
 
 		p->priv->support_window_hook = NULL;
 		arcan_tui_destroy(M->tui, NULL);
@@ -127,6 +173,7 @@ static void execstate(struct tui_context* T, int state, void* tag)
 
 	if (state == 2){
 		if (a11y->oracle){
+			shmifsrv_free(a11y->oracle, 0);
 			a11y->oracle = NULL;
 			a11y->oracle_fail = true;
 		}
