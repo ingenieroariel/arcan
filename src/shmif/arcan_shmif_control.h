@@ -1028,7 +1028,7 @@ struct arcan_shmif_page {
 /*
  * see dirty- field in _cont, manipulate there, not here.
  */
-	volatile _Atomic struct arcan_shmif_region dirty;
+	_Atomic struct arcan_shmif_region dirty;
 	volatile _Atomic int16_t scroll_dx;
 	volatile _Atomic int16_t scroll_dy;
 
