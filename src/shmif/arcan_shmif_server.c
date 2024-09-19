@@ -505,7 +505,7 @@ struct shmifsrv_vbuffer shmifsrv_video(struct shmifsrv_client* cl)
 		&cl->con->shm.ptr->vpending, memory_order_consume);
 
 	res.buffer = cl->con->vbufs[vready];
-	res.region = atomic_load(&cl->con->shm.ptr->dirty);
+	res.region = __atomic_load_n(&cl->con->shm.ptr->dirty, __ATOMIC_SEQ_CST);
 
 /* if we have negotiated compressed passthrough, set res.flags, copy /verify
  * framesize - if that fails, we need to propagate the bufferfail so the client
@@ -765,7 +765,8 @@ int shmifsrv_put_video(
 
 		atomic_store(&C->con->shm.ptr->hints, fflags);
     atomic_store(&C->con->shm.ptr->vready, 1);
-		atomic_store(&C->con->shm.ptr->dirty, V->region);
+		__atomic_store_n(&C->con->shm.ptr->dirty, V->region, __ATOMIC_SEQ_CST);
+
 
 		shmifsrv_enqueue_event(C, &(struct arcan_event){
 			.tgt.kind = TARGET_COMMAND_STEPFRAME,
