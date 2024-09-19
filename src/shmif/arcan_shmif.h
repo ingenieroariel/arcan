@@ -67,6 +67,8 @@ extern "C" {
 #include "arcan_shmif_control.h"
 #include "arcan_shmif_defs.h"
 
+FILE *open_memstream(char **bufp, size_t *sizep);
+
 #ifndef __cplusplus
 #include "arcan_shmif_sub.h"
 #else

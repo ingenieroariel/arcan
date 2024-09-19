@@ -191,6 +191,96 @@ enum intercept_type {
 	INTERCEPT_MAP
 };
 
+struct memstream {
+    char **bufp;
+    size_t *sizep;
+    char *buf;
+    size_t size;
+    size_t capacity;
+    size_t pos;
+};
+
+static int memstream_write(void *cookie, const char *buf, int size) {
+    struct memstream *ms = (struct memstream *)cookie;
+    if (ms->pos + size >= ms->capacity) {
+        size_t new_capacity = (ms->pos + size) * 2;
+        char *new_buf = realloc(ms->buf, new_capacity);
+        if (!new_buf)
+            return -1; // Error
+        ms->buf = new_buf;
+        ms->capacity = new_capacity;
+    }
+    memcpy(ms->buf + ms->pos, buf, size);
+    ms->pos += size;
+    if (ms->pos > ms->size)
+        ms->size = ms->pos;
+    return size;
+}
+
+static fpos_t memstream_seek(void *cookie, fpos_t offset, int whence) {
+    struct memstream *ms = (struct memstream *)cookie;
+    size_t new_pos;
+    switch (whence) {
+    case SEEK_SET:
+        new_pos = offset;
+        break;
+    case SEEK_CUR:
+        new_pos = ms->pos + offset;
+        break;
+    case SEEK_END:
+        new_pos = ms->size + offset;
+        break;
+    default:
+        return -1;
+    }
+    if (new_pos > ms->size)
+        return -1; // Can't seek beyond current size
+    ms->pos = new_pos;
+    return ms->pos;
+}
+
+static int memstream_close(void *cookie) {
+    struct memstream *ms = (struct memstream *)cookie;
+    // Null-terminate the buffer
+    if (ms->pos + 1 >= ms->capacity) {
+        char *new_buf = realloc(ms->buf, ms->pos + 1);
+        if (!new_buf)
+            return -1; // Error
+        ms->buf = new_buf;
+        ms->capacity = ms->pos + 1;
+    }
+    ms->buf[ms->pos] = '\0';
+    ms->size = ms->pos;
+    *ms->bufp = ms->buf;
+    *ms->sizep = ms->size;
+    free(ms);
+    return 0;
+}
+
+FILE *open_memstream(char **bufp, size_t *sizep) {
+    struct memstream *ms = malloc(sizeof(struct memstream));
+    if (!ms)
+        return NULL;
+    ms->bufp = bufp;
+    ms->sizep = sizep;
+    ms->buf = malloc(128); // Initial capacity
+    if (!ms->buf) {
+        free(ms);
+        return NULL;
+    }
+    ms->size = 0;
+    ms->capacity = 128;
+    ms->pos = 0;
+
+    FILE *fp = funopen(ms, NULL, memstream_write, memstream_seek, memstream_close);
+    if (!fp) {
+        free(ms->buf);
+        free(ms);
+        return NULL;
+    }
+    return fp;
+}
+
 static int can_intercept(struct stat* s)
 {
 	int mode = s->st_mode & S_IFMT;
